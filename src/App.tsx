@@ -1,5 +1,14 @@
 import { ChangeEventHandler, ReactNode, useState } from "react";
 import { z } from "zod";
+
+const integerRegex = /^-?[0-9]+$/;
+const integerTransform = Number;
+
+const floatRegex = /^-?[0-9]+([.,][0-9]+)?$/;
+const floatTransform = (str: string) => {
+  return Number(str.replace(",", "."));
+};
+
 export default function App() {
   const [mode, setMode] = useState("firstLast");
   return (
@@ -42,18 +51,9 @@ export default function App() {
 }
 
 const firstLastSchema = z.object({
-  n: z
-    .string()
-    .regex(/[0-9]+/)
-    .transform(Number),
-  first: z
-    .string()
-    .regex(/[0-9]+([.,][0-9]+)?/)
-    .transform(Number),
-  last: z
-    .string()
-    .regex(/[0-9]+([.,][0-9]+)?/)
-    .transform(Number),
+  n: z.string().regex(integerRegex).transform(integerTransform),
+  first: z.string().regex(floatRegex).transform(floatTransform),
+  last: z.string().regex(floatRegex).transform(floatTransform),
 });
 
 function FirstLastForm() {
@@ -100,7 +100,7 @@ function FirstLastForm() {
           setShowResult(true);
         }}
       >
-        Submit
+        Порахувати
       </button>
       {showResult && variables !== undefined && (
         <>Сума: {((variables.first + variables.last) / 2) * variables.n}</>
@@ -113,6 +113,7 @@ function FirstLastForm() {
 function NumberInput({
   value,
   onChange,
+  id,
   integer = false,
 }: {
   id: string;
@@ -123,6 +124,7 @@ function NumberInput({
   return (
     <input
       type="number"
+      id={id}
       onChange={onChange}
       value={value}
       step={integer ? 1 : "any"}
