@@ -1,6 +1,5 @@
 import { ChangeEventHandler, ReactNode, useState } from "react";
-import Math from "./components/Math";
-
+import { z } from "zod";
 export default function App() {
   const [mode, setMode] = useState("firstLast");
   return (
@@ -36,10 +35,100 @@ export default function App() {
             onChange={(e) => setMode(e.target.value)}
           />
         </fieldset>
-        {mode}
-        <Math text={"2+2=4"} />
+        {mode === "firstLast" && <FirstLastForm />}
       </main>
     </div>
+  );
+}
+
+const firstLastSchema = z.object({
+  n: z
+    .string()
+    .regex(/[0-9]+/)
+    .transform(Number),
+  first: z
+    .string()
+    .regex(/[0-9]+([.,][0-9]+)?/)
+    .transform(Number),
+  last: z
+    .string()
+    .regex(/[0-9]+([.,][0-9]+)?/)
+    .transform(Number),
+});
+
+function FirstLastForm() {
+  const [inputVars, setInputVars] = useState({
+    n: "",
+    first: "",
+    last: "",
+  });
+  const [showResult, setShowResult] = useState(false);
+
+  const parseResult = firstLastSchema.safeParse(inputVars);
+  const variables = parseResult.success ? parseResult.data : undefined;
+
+  return (
+    <form className="flex flex-col items-start">
+      <NumberInput
+        id="n"
+        onChange={(e) => {
+          setInputVars({ ...inputVars, n: e.target.value });
+          setShowResult(false);
+        }}
+        value={inputVars.n}
+        integer
+      />
+      <NumberInput
+        id="first"
+        onChange={(e) => {
+          setInputVars({ ...inputVars, first: e.target.value });
+          setShowResult(false);
+        }}
+        value={inputVars.first}
+      />
+      <NumberInput
+        id="last"
+        onChange={(e) => {
+          setInputVars({ ...inputVars, last: e.target.value });
+          setShowResult(false);
+        }}
+        value={inputVars.last}
+      />
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          setShowResult(true);
+        }}
+      >
+        Submit
+      </button>
+      {showResult && variables !== undefined && (
+        <>Сума: {((variables.first + variables.last) / 2) * variables.n}</>
+      )}
+      {showResult && variables === undefined && "Невірні вхідні дані."}
+    </form>
+  );
+}
+
+function NumberInput({
+  value,
+  onChange,
+  integer = false,
+}: {
+  id: string;
+  value: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  integer?: boolean;
+}) {
+  return (
+    <input
+      type="number"
+      onChange={onChange}
+      value={value}
+      step={integer ? 1 : "any"}
+      className="border-2 border-gray-400 rounded-lg min-w-0"
+      required
+    />
   );
 }
 
