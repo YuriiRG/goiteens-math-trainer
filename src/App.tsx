@@ -5,7 +5,7 @@ import {
   useState,
 } from "react";
 import { z } from "zod";
-import Math from "./components/Math";
+import Latex from "./components/Latex";
 
 const integerRegex = /^-?[0-9]+$/;
 const integerTransform = Number;
@@ -20,9 +20,10 @@ export default function App() {
   return (
     <div className="flex justify-center p-2">
       <main className="w-[65ch]">
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-3xl font-bold mb-2">
           Знайти суму арифметичної прогресії
         </h1>
+        <h2 className="text-2xl font-bold mb-2">Калькулятор</h2>
         <fieldset>
           <RadioButton
             group="mode"
@@ -31,8 +32,8 @@ export default function App() {
             label={
               <>
                 значення першого та останнього членів арифметичної прогресії (
-                <Math className="inline" text="a_1" />,{" "}
-                <Math className="inline" text="a_n" />)
+                <Latex className="inline" text="a_1" />,{" "}
+                <Latex className="inline" text="a_n" />)
               </>
             }
             onChange={(e) => setMode(e.target.value)}
@@ -44,8 +45,8 @@ export default function App() {
             label={
               <>
                 значення першого члена арифметичної прогресії і крок прогресії (
-                <Math className="inline" text="a_1" />,{" "}
-                <Math className="inline" text="d" />)
+                <Latex className="inline" text="a_1" />,{" "}
+                <Latex className="inline" text="d" />)
               </>
             }
             onChange={(e) => setMode(e.target.value)}
@@ -58,8 +59,8 @@ export default function App() {
               <>
                 значення одного з членів арифметичної прогресії і крок прогресії
                 (
-                <Math className="inline" text="a_i" />,{" "}
-                <Math className="inline" text="d" />)
+                <Latex className="inline" text="a_i" />,{" "}
+                <Latex className="inline" text="d" />)
               </>
             }
             onChange={(e) => setMode(e.target.value)}
@@ -71,8 +72,8 @@ export default function App() {
             label={
               <>
                 значення двох членів арифметичної прогресії (
-                <Math className="inline" text="a_i" />,{" "}
-                <Math className="inline" text="a_j" />)
+                <Latex className="inline" text="a_i" />,{" "}
+                <Latex className="inline" text="a_j" />)
               </>
             }
             onChange={(e) => setMode(e.target.value)}
@@ -83,6 +84,13 @@ export default function App() {
         {mode === "firstStep" && <FirstStepForm />}
         {mode === "oneStep" && <OneStepForm />}
         {mode === "two" && <TwoForm />}
+        <h2 className="text-2xl font-bold my-2">Теорія</h2>
+        Сума перших <Latex className="inline" text="n" /> членів арифметичної
+        прогресії{" "}
+        <Latex className="inline" text="S_n = a_1 + a_2 + ... + a_n" /> може
+        бути знайдена за формулами:
+        <Latex text="S_n = \frac{a_1+a_n}{2} \cdot n" blockMode />
+        <Latex text="S_n = \frac{2a_1+(n-1)d}{2} \cdot n" blockMode />
       </main>
     </div>
   );
@@ -114,11 +122,11 @@ function FirstLastForm() {
           setShowResult(false);
         }}
         value={inputVars.n}
-        label={<Math text="n = " />}
+        label={<Latex text="n = " />}
         integer
       />
       <NumberInput
-        label={<Math text="a_1 = " />}
+        label={<Latex text="a_1 = " />}
         id="first"
         onChange={(e) => {
           setInputVars({ ...inputVars, first: e.target.value });
@@ -127,7 +135,7 @@ function FirstLastForm() {
         value={inputVars.first}
       />
       <NumberInput
-        label={<Math text="a_n = " />}
+        label={<Latex text="a_n = " />}
         id="last"
         onChange={(e) => {
           setInputVars({ ...inputVars, last: e.target.value });
@@ -143,8 +151,14 @@ function FirstLastForm() {
       >
         Порахувати
       </SubmitButton>
+      {!showResult && "Сума:"}
       {showResult && variables !== undefined && (
-        <>Сума: {((variables.first + variables.last) / 2) * variables.n}</>
+        <>
+          Сума:{" "}
+          {Math.round(
+            ((variables.first + variables.last) / 2) * variables.n * 1000,
+          ) / 1000}
+        </>
       )}
       {showResult && variables === undefined && "Невірні вхідні дані."}
     </form>
@@ -171,7 +185,7 @@ function FirstStepForm() {
   return (
     <form className="flex flex-col items-start gap-3 mt-3">
       <NumberInput
-        label={<Math text="n = " />}
+        label={<Latex text="n = " />}
         id="n"
         onChange={(e) => {
           setInputVars({ ...inputVars, n: e.target.value });
@@ -181,7 +195,7 @@ function FirstStepForm() {
         integer
       />
       <NumberInput
-        label={<Math text="a_1 = " />}
+        label={<Latex text="a_1 = " />}
         id="first"
         onChange={(e) => {
           setInputVars({ ...inputVars, first: e.target.value });
@@ -190,7 +204,7 @@ function FirstStepForm() {
         value={inputVars.first}
       />
       <NumberInput
-        label={<Math text="d = " />}
+        label={<Latex text="d = " />}
         id="step"
         onChange={(e) => {
           setInputVars({ ...inputVars, step: e.target.value });
@@ -206,11 +220,15 @@ function FirstStepForm() {
       >
         Порахувати
       </SubmitButton>
+      {!showResult && "Сума:"}
       {showResult && variables !== undefined && (
         <>
           Сума:{" "}
-          {((2 * variables.first + (variables.n - 1) * variables.step) / 2) *
-            variables.n}
+          {Math.round(
+            ((2 * variables.first + (variables.n - 1) * variables.step) / 2) *
+              variables.n *
+              1000,
+          ) / 1000}
         </>
       )}
       {showResult && variables === undefined && "Невірні вхідні дані."}
@@ -240,7 +258,7 @@ function OneStepForm() {
   return (
     <form className="flex flex-col items-start gap-3 mt-3">
       <NumberInput
-        label={<Math text="n = " />}
+        label={<Latex text="n = " />}
         id="n"
         onChange={(e) => {
           setInputVars({ ...inputVars, n: e.target.value });
@@ -253,7 +271,7 @@ function OneStepForm() {
         значення коефіцієнтів і відповідні їм значення членів прогресії:
       </div>
       <NumberInput
-        label={<Math text="i = " />}
+        label={<Latex text="i = " />}
         id="index"
         onChange={(e) => {
           setInputVars({ ...inputVars, index: e.target.value });
@@ -264,19 +282,17 @@ function OneStepForm() {
       />
       <NumberInput
         id="value"
-        label={<Math text="a_i = " />}
+        label={<Latex text="a_i = " />}
         onChange={(e) => {
           setInputVars({ ...inputVars, value: e.target.value });
           setShowResult(false);
         }}
         value={inputVars.value}
       />
-      <div>
-        крок прогресії:
-      </div>
+      <div>крок прогресії:</div>
       <NumberInput
         id="step"
-        label={<Math text="d = " />}
+        label={<Latex text="d = " />}
         onChange={(e) => {
           setInputVars({ ...inputVars, step: e.target.value });
           setShowResult(false);
@@ -291,13 +307,17 @@ function OneStepForm() {
       >
         Порахувати
       </SubmitButton>
+      {!showResult && "Сума:"}
       {showResult && variables !== undefined && (
         <>
           Сума:{" "}
-          {((2 * (variables.value - (variables.index - 1) * variables.step) +
-            (variables.n - 1) * variables.step) /
-            2) *
-            variables.n}
+          {Math.round(
+            ((2 * (variables.value - (variables.index - 1) * variables.step) +
+              (variables.n - 1) * variables.step) /
+              2) *
+              variables.n *
+              1000,
+          ) / 1000}
         </>
       )}
       {showResult && variables === undefined && "Невірні вхідні дані."}
@@ -333,7 +353,7 @@ function TwoForm() {
   return (
     <form className="flex flex-col items-start gap-3 mt-3">
       <NumberInput
-        label={<Math text="n = " />}
+        label={<Latex text="n = " />}
         id="n"
         onChange={(e) => {
           setInputVars({ ...inputVars, n: e.target.value });
@@ -346,7 +366,7 @@ function TwoForm() {
         значення коефіцієнтів і відповідні їм значення членів прогресії:
       </div>
       <NumberInput
-        label={<Math text="i = " />}
+        label={<Latex text="i = " />}
         id="index"
         onChange={(e) => {
           setInputVars({ ...inputVars, index: e.target.value });
@@ -356,7 +376,7 @@ function TwoForm() {
         integer
       />
       <NumberInput
-        label={<Math text="a_i = " />}
+        label={<Latex text="a_i = " />}
         id="value"
         onChange={(e) => {
           setInputVars({ ...inputVars, value: e.target.value });
@@ -365,7 +385,7 @@ function TwoForm() {
         value={inputVars.value}
       />
       <NumberInput
-        label={<Math text="j = " />}
+        label={<Latex text="j = " />}
         id="index2"
         onChange={(e) => {
           setInputVars({ ...inputVars, index2: e.target.value });
@@ -375,7 +395,7 @@ function TwoForm() {
         integer
       />
       <NumberInput
-        label={<Math text="a_j = " />}
+        label={<Latex text="a_j = " />}
         id="value2"
         onChange={(e) => {
           setInputVars({ ...inputVars, value2: e.target.value });
@@ -391,13 +411,17 @@ function TwoForm() {
       >
         Порахувати
       </SubmitButton>
+      {!showResult && "Сума:"}
       {showResult && variables !== undefined && step !== undefined && (
         <>
           Сума:{" "}
-          {((2 * (variables.value - (variables.index - 1) * step) +
-            (variables.n - 1) * step) /
-            2) *
-            variables.n}
+          {Math.round(
+            ((2 * (variables.value - (variables.index - 1) * step) +
+              (variables.n - 1) * step) /
+              2) *
+              variables.n *
+              1000,
+          ) / 1000}
         </>
       )}
       {showResult && variables === undefined && "Невірні вхідні дані."}
