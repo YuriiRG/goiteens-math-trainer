@@ -19,7 +19,7 @@ export default function Latex({
       }
       throw error;
     }
-  }, [text]);
+  }, [text, blockMode]);
   if (html.error) {
     return <div className={className}>Invalid LaTeX</div>;
   }
