@@ -6,6 +6,7 @@ import {
 } from "react";
 import { z } from "zod";
 import Latex from "./components/Latex";
+import { sumFirstLast, sumFirstStep, sumOneStep, sumTwo } from "./math";
 
 const integerRegex = /^-?[0-9]+$/;
 const integerTransform = Number;
@@ -153,12 +154,7 @@ function FirstLastForm() {
       </SubmitButton>
       {!showResult && "Сума:"}
       {showResult && variables !== undefined && (
-        <>
-          Сума:{" "}
-          {Math.round(
-            ((variables.first + variables.last) / 2) * variables.n * 1000,
-          ) / 1000}
-        </>
+        <>Сума: {sumFirstLast(variables)}</>
       )}
       {showResult && variables === undefined && "Невірні вхідні дані."}
     </form>
@@ -222,14 +218,7 @@ function FirstStepForm() {
       </SubmitButton>
       {!showResult && "Сума:"}
       {showResult && variables !== undefined && (
-        <>
-          Сума:{" "}
-          {Math.round(
-            ((2 * variables.first + (variables.n - 1) * variables.step) / 2) *
-              variables.n *
-              1000,
-          ) / 1000}
-        </>
+        <>Сума: {sumFirstStep(variables)}</>
       )}
       {showResult && variables === undefined && "Невірні вхідні дані."}
     </form>
@@ -309,16 +298,7 @@ function OneStepForm() {
       </SubmitButton>
       {!showResult && "Сума:"}
       {showResult && variables !== undefined && (
-        <>
-          Сума:{" "}
-          {Math.round(
-            ((2 * (variables.value - (variables.index - 1) * variables.step) +
-              (variables.n - 1) * variables.step) /
-              2) *
-              variables.n *
-              1000,
-          ) / 1000}
-        </>
+        <>Сума: {sumOneStep(variables)}</>
       )}
       {showResult && variables === undefined && "Невірні вхідні дані."}
     </form>
@@ -346,10 +326,7 @@ function TwoForm() {
 
   const parseResult = twoSchema.safeParse(inputVars);
   const variables = parseResult.success ? parseResult.data : undefined;
-  const step = variables
-    ? (variables.value - variables.value2) /
-      (variables.index - variables.index2)
-    : undefined;
+
   return (
     <form className="flex flex-col items-start gap-3 mt-3">
       <NumberInput
@@ -412,18 +389,7 @@ function TwoForm() {
         Порахувати
       </SubmitButton>
       {!showResult && "Сума:"}
-      {showResult && variables !== undefined && step !== undefined && (
-        <>
-          Сума:{" "}
-          {Math.round(
-            ((2 * (variables.value - (variables.index - 1) * step) +
-              (variables.n - 1) * step) /
-              2) *
-              variables.n *
-              1000,
-          ) / 1000}
-        </>
-      )}
+      {showResult && variables !== undefined && <>Сума: {sumTwo(variables)}</>}
       {showResult && variables === undefined && "Невірні вхідні дані."}
     </form>
   );
